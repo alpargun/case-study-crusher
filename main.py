@@ -35,6 +35,25 @@ for col in numeric_cols:
 
 df[numeric_cols]    
 
+
+#%% Convert date strings to datetime to allow arithmetic operations
+
+from datetime import datetime
+
+dt_str = '09.05.2022 14:59:06'
+
+dt_format = '%d.%m.%Y %H:%M:%S'
+
+dt_obj = datetime.strptime(dt_str, dt_format)
+print(dt_obj)
+
+date_cols = ['Z121_Time', 'H122_Time']
+
+for col in date_cols:
+    df[col] = df[col].apply(lambda _: datetime.strptime(_,dt_format))
+df[date_cols]
+
+
 #%% 3. Analysis ---------------------------------------------------------------------------------------
 
 # Check if Z121 and H122 times are the same
@@ -42,6 +61,9 @@ df[numeric_cols]
 df[df.columns[0]].equals(df[df.columns[2]])
 
 
+#%% Maintenance case
+# The crusher is still operating but there is no waste
+df[df.eval("Z121_Rotation_speed_in_percent != 0 & (H122_volumetric_flow_rate_in_m3_h == 0)")]
 
-# %%
-
+# %% Shift changes
+# The crusher is not operating
