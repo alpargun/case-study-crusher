@@ -1,11 +1,8 @@
 
-#%% Import statements
-
-import pandas as pd
-
-
 #%% 1. Load Data --------------------------------------------------------------------------------------
  
+import pandas as pd
+
 # Read csv as a dataframe
 
 path = 'Case_study_Crusher.csv'
@@ -40,21 +37,45 @@ df[numeric_cols]
 
 from datetime import datetime
 
-dt_str = '09.05.2022 14:59:06'
-
-dt_format = '%d.%m.%Y %H:%M:%S'
-
-dt_obj = datetime.strptime(dt_str, dt_format)
-print(dt_obj)
-
 date_cols = ['Z121_Time', 'H122_Time']
+dt_format = '%d.%m.%Y %H:%M:%S'
 
 for col in date_cols:
     df[col] = df[col].apply(lambda _: datetime.strptime(_,dt_format))
 df[date_cols]
 
 
-#%% 3. Analysis ---------------------------------------------------------------------------------------
+#%% 3. Visualization
+
+from plotly.subplots import make_subplots
+import plotly.graph_objects as go
+
+# Use a smaller partition of the data
+df2 = df[0:10000]
+
+fig = make_subplots(rows=2, cols=1)
+
+fig.append_trace(go.Scatter(
+    x=df2['Z121_Time'], 
+    y=df2['Z121_Rotation_speed_in_percent'],
+    name='Z121'
+), row=1, col=1)
+
+fig.append_trace(go.Scatter(
+    x=df2['H122_Time'], 
+    y=df2['H122_volumetric_flow_rate_in_m3_h'],
+    name='H122'
+), row=2, col=1)
+
+fig.update_yaxes(title_text="Z121_Rotation_speed", row=1, col=1)
+fig.update_yaxes(title_text="H122_volumetric_flow_rate", row=2, col=1)
+
+
+fig.update_layout(height=600, width=600)
+fig.show()
+
+
+#%% 4. Analysis ---------------------------------------------------------------------------------------
 
 # Check if Z121 and H122 times are the same
 
